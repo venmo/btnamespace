@@ -6,6 +6,7 @@ TODO travis badge
 A Braintree namespace isolates state on the Braintree gateway:
 
 .. code-block:: python
+
     import braintree
     import btnamespace
     
@@ -19,6 +20,7 @@ A Braintree namespace isolates state on the Braintree gateway:
 This is primarily useful during integration tests:
 
 .. code-block:: python
+
     def setUp(self):
         self.namespace = btnamespace.Namespace()
         self.namespace.__enter__()
@@ -27,7 +29,7 @@ This is primarily useful during integration tests:
         #...
         
     def tearDown(self):
-        self.namespace.__exit()
+        self.namespace.__exit__()
 
 
 Compared to calling eg ``braintree.Customer.delete`` during ``tearDown``, this has a number of advantages:
@@ -70,11 +72,15 @@ Contributing
 
 Inside your vitualenv:
 
+.. code-block::
+
     $ cd btnamespace
     $ pip install -e .
     $ pip install -r requirements.txt
 
 To run the tests, first add your sandbox credentials:
+
+.. code-block::
 
     $ export BT_MERCHANT_ID=merchant-id
     $ export BT_PUBLIC_KEY=public-id
