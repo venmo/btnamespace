@@ -112,6 +112,7 @@ class PatchFindTest(NamespaceTest):
         result = braintree.Transaction.sale({
             "id": "txn_id",
             "amount": "10.00",
+            "order_id": str(uuid.uuid4()),  # sidestep duplicate transaction validation
             "credit_card": {
                 "token": "credit_card_token",
                 "number": "4111111111111111",
