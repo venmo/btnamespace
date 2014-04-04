@@ -1,7 +1,7 @@
 btnamespace
 ===========
 
-TODO travis badge
+.. image:: https://travis-ci.org/venmo/btnamespace.svg?branch=master   :target: https://travis-ci.org/venmo/btnamespace
 
 A Braintree namespace isolates state on the Braintree gateway:
 
