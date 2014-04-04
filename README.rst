@@ -48,7 +48,8 @@ What's supported
 
 All operations involving subresources - eg creating a CreditCard and Customer in one call - work as expected.
 
-Adding support for other operations is easy; we just haven't needed them yet. Contributions welcome!
+Adding support for other operations is easy; we just haven't needed them yet.
+Contributions welcome!
 
 
 How it Works
@@ -63,8 +64,6 @@ Here's an example:
 - on a call to ``braintree.Customer.create({'id': '123', ...})``, ``'123'`` is stored as a Customer id and the call becomes ``braintree.Customer.create({...})``.
 - then, the server returns a unique id ``'abcde'`` for the Customer. ``'123'`` is mapped to ``'abcde'``, and the resulting Customer object's id is set to ``'123'``.
 - later, a call to ``braintree.Customer.find('123')`` becomes ``braintree.Customer.find('abcde')``.
-
-TODO explain and link to schemas
 
 
 Contributing
