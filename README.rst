@@ -72,18 +72,20 @@ Contributing
 
 Inside your vitualenv:
 
-.. code-block::
+.. code-block:: bash
 
     $ cd btnamespace
     $ pip install -e .
     $ pip install -r requirements.txt
 
+
 To run the tests, first add your sandbox credentials:
 
-.. code-block::
+.. code-block:: bash
 
     $ export BT_MERCHANT_ID=merchant-id
     $ export BT_PUBLIC_KEY=public-id
     $ export BT_PRIVATE_KEY=private-key
+
 
 Then run ``$ python tests/test_integration.py``.
