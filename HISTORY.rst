@@ -2,7 +2,7 @@ History
 -------
 
 1.0.0
-+++++++++
-released XXXX-XX-XX
++++++
+released 2014-04-07
 
 - initial release
