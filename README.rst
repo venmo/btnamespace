@@ -39,6 +39,8 @@ Compared to calling eg ``braintree.Customer.delete`` during ``tearDown``, this h
 -  it's simpler, since it doesn't require any bookkeeping
 -  it's robust, since tests can be written without any state assumptions
 
+You can install it with ``$ pip install btnamespace``.
+
 
 What's supported
 ----------------
