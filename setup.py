@@ -11,7 +11,6 @@ packages = ['btnamespace']
 requires = [
     'bidict',
     'braintree',
-    'decorator',
 ]
 
 with open('README.rst') as f:

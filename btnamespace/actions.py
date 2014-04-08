@@ -2,29 +2,29 @@ import collections
 import logging
 
 from bidict import namedbidict
-from decorator import decorator
 
-from .shared import get_caller_args
+from .compat import getcallargs
 
 logger = logging.getLogger(__name__)
 
 IDMap = namedbidict('IDMap', 'fake_ids', 'real_ids')
 
 
-@decorator  # just like in patch, this is needed for get_caller_args usage
-def ensure_state_is_init(f, *args, **kwargs):
-    # There's not currently a place to provide global init for the state dict,
-    # each action needs to ensure subitems are initialized.
+def ensure_state_is_init(f):
+    def wrapper(*args, **kwargs):
+        # There's not currently a place to provide global init for the state dict,
+        # each action needs to ensure subitems are initialized.
 
-    named_args, _ = get_caller_args()
-    state = named_args['state']
+        named_args = getcallargs(f, *args, **kwargs)
+        state = named_args['state']
 
-    if 'id_maps' not in state:
-        state['id_maps'] = collections.defaultdict(IDMap)
-    if 'last_fake_ids' not in state:
-        state['last_fake_ids'] = {}
+        if 'id_maps' not in state:
+            state['id_maps'] = collections.defaultdict(IDMap)
+        if 'last_fake_ids' not in state:
+            state['last_fake_ids'] = {}
 
-    return f(*args, **kwargs)
+        return f(*args, **kwargs)
+    return wrapper
 
 
 def clear_old_creation_ids(state, call_params):
