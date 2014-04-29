@@ -1,0 +1,2 @@
+recursive-include btnamespace *.py
+include HISTORY.rst LICENSE README.rst

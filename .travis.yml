@@ -1,0 +1,14 @@
+language: python
+python:
+- '2.6'
+- '2.7'
+install:
+- python setup.py sdist --formats=zip -k
+- find ./dist -iname "*.zip" -print0 | xargs -0 pip install
+- pip install -r requirements.txt
+script: python tests/test_integration.py
+env:
+  global:
+  - secure: JSIMhCnYcJWMqvJb+VcIbDtRja8qd1ycq4g2nI6deNSoYD4ZTf+/7YZOybIkw0w7p4URYQ29VghQLkLQHVO080JnYzxBciMVnXObkm/2exm2NsdSvf1LFtz6CuuRNo/zyY8yefN+05x4gcV77E1T3hlzrYHOQoIF3fOTMdVfJEo=
+  - secure: aYDGvYTslalwOV7BuN6LTGhhio4SAvQkoT7hcR2D0YpYtO3vzJQMoW+e4fZwh4foqJj+n1vhJn7FzIbLTJ7l3K2n/2YnO53pCw+7/oeqFv+WNQxITxI7CsFGt6Ydh0bowHeUCrJuz99Ag2x0vinyEILMuTVB0OPh9gN08bvFGaQ=
+  - secure: FOr55kteWd0YR6C+zL+JkUq8bTiRfQOCYm2TkaYb269rccaG10gO+tV4coqMMWx5VTPk8z/xMO9fYEFyd1l3qmjvHSS+TUMuudHerJsfPCgzHlKn4L5TctdtHUyo6cldlG6ruvQR++yfAzvwNr/rz+mjiBCx3GFoK177qF7MLCE=
