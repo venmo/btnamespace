@@ -494,6 +494,22 @@ class PatchAdvancedSearch(NamespaceTest):
                 braintree.TransactionSearch.customer_id == 'my_id'
             )
 
+class PatchClientTokenGenerate(NamespaceTest):
+    def test_client_token_generate_with_customer_id(self):
+        result = braintree.Customer.create({
+            "id": "customer_id",
+            "first_name": "Jen",
+            "last_name": "Smith",
+            "company": "Braintree",
+            "email": "jen@example.com",
+            "phone": "312.555.1234",
+            "fax": "614.555.5678",
+            "website": "www.example.com"
+        })
+        self.assertTrue(result.is_success, result)
+        client_token = braintree.ClientToken.generate({'customer_id': 'customer_id'})
+        self.assertIsNotNone(client_token)
+
 
 class UnpatchAllMethods(NamespaceTest):
     def test_all_methods_get_unpatched(self):
