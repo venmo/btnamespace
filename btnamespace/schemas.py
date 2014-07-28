@@ -169,4 +169,15 @@ schemas = [
         }
     ),
     # Transactions can not be deleted nor updated.
+
+    # client tokens
+    schema(
+        bt_class=braintree.ClientToken,
+        method_name='generate',
+        params={
+            'params': {
+                'customer_id': fake_id(braintree.Customer)
+            }
+        }
+    ),
 ]
