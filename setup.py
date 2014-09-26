@@ -9,7 +9,7 @@ except ImportError:
 
 packages = ['btnamespace']
 requires = [
-    'bidict',
+    'bidict==0.1.5',
     'braintree',
 ]
 
