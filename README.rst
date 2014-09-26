@@ -10,12 +10,12 @@ A Braintree namespace isolates state on the Braintree gateway:
 
     import braintree
     import btnamespace
-    
+
     with btnamespace.Namespace():
         customer = braintree.Customer.create({"id": "123"})
         assert customer.id == "123"
         braintree.Customer.find("123")  # success
-    
+
     braintree.Customer.find("123")  # NotFound exception
 
 This is primarily useful during integration tests:
@@ -25,10 +25,10 @@ This is primarily useful during integration tests:
     def setUp(self):
         self.namespace = btnamespace.Namespace()
         self.namespace.__enter__()
-        
+
     def test_some_sandbox_integration(self):
         #...
-        
+
     def tearDown(self):
         self.namespace.__exit__()
 

@@ -1,5 +1,10 @@
 History
 -------
+1.1.1
++++++
+released 2014-09-26
+
+- pin bidict to 0.1.5 to avoid breaking changes in newer versions
 
 1.1.0
 +++++
