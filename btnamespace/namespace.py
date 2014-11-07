@@ -14,13 +14,18 @@ class Namespace(object):
 
     def __init__(self, custom_schemas=None, options=None):
         """
-        :param customer_schemas: (optional) a list of CallSchemas to guide patching.
+        :param custom_schemas: (optional) a list of CallSchemas to guide patching.
           If they're not provided, those defined in actions.schemas will be used.
         :param options (optional) a dictionary of configuration passed through to
-          actions. Built in options:
+          actions. The same instance is passed to options; it can be mutated
+          at runtime to affect the next action run.
+
+          Built in options:
               * 'strict_missing': raise a braintree.exceptions.NotFoundError when
-                non-namespaced resources are requested. By default this will be
-                warned and logged, but the request allowed to be made.
+                non-namespaced resources are requested. Default behavior is to
+                log a warning but allow the request to proceed, which
+                can potentially return non-namespaced resources from inside
+                a namespace.
 
           All options are False by default.
         """
