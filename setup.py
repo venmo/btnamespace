@@ -11,6 +11,7 @@ packages = ['btnamespace']
 requires = [
     'bidict==0.1.5',
     'braintree',
+    'mock',
 ]
 
 with open('README.rst') as f:

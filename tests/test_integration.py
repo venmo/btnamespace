@@ -15,11 +15,38 @@ braintree.Configuration.configure(
 )
 
 
+def _ensure_user_exists(user_params):
+    try:
+        braintree.Customer.find(user_params['id'])
+    except braintree.exceptions.NotFoundError:
+        braintree.Customer.create(user_params)
+
+    braintree.Customer.find(user_params['id'])
+
+
 class NamespaceTest(TestCase):
     def setUp(self):
         self.namespace = Namespace()
         self.namespace.__enter__()
         self.addCleanup(self.namespace.__exit__)
+
+
+class ActionOutsideNamespaceTest(TestCase):
+    def test_customer_operations_outside_of_namespace(self):
+        with self.assertRaises(braintree.exceptions.NotFoundError):
+            braintree.Customer.find('nonexistent')
+
+        _ensure_user_exists({
+            'id': 'nonnamespaced',
+        })
+
+        with Namespace():
+            pass
+
+        try:
+            braintree.Customer.find('nonnamespaced')
+        except braintree.exceptions.NotFoundError:
+            self.fail()
 
 
 class PatchDeleteTest(NamespaceTest):
@@ -494,6 +521,7 @@ class PatchAdvancedSearch(NamespaceTest):
                 braintree.TransactionSearch.customer_id == 'my_id'
             )
 
+
 class PatchClientTokenGenerate(NamespaceTest):
     def test_client_token_generate_with_customer_id(self):
         result = braintree.Customer.create({
@@ -511,21 +539,65 @@ class PatchClientTokenGenerate(NamespaceTest):
         self.assertIsNotNone(client_token)
 
 
-class UnpatchAllMethods(NamespaceTest):
-    def test_all_methods_get_unpatched(self):
-        self.namespace.__exit__()  # exit the global namespace
-
+class PatchAllTest(TestCase):
+    def test_schema_methods_get_patched(self):
         original_methods = [
+            braintree.Customer.__init__,
             braintree.Customer.find,
             braintree.Customer.create,
             braintree.Customer.delete,
             braintree.Customer.update,
+            braintree.CreditCard.__init__,
             braintree.CreditCard.find,
             braintree.CreditCard.create,
             braintree.CreditCard.delete,
             braintree.CreditCard.update,
+            braintree.Transaction.__init__,
             braintree.Transaction.find,
             braintree.Transaction.create,
+        ]
+
+        with Namespace():
+            patched_methods = [
+                braintree.Customer.__init__,
+                braintree.Customer.find,
+                braintree.Customer.create,
+                braintree.Customer.delete,
+                braintree.Customer.update,
+                braintree.CreditCard.__init__,
+                braintree.CreditCard.find,
+                braintree.CreditCard.create,
+                braintree.CreditCard.delete,
+                braintree.CreditCard.update,
+                braintree.Transaction.__init__,
+                braintree.Transaction.find,
+                braintree.Transaction.create,
+            ]
+
+        unpatched_methods = [
+            braintree.Customer.__init__,
+            braintree.Customer.find,
+            braintree.Customer.create,
+            braintree.Customer.delete,
+            braintree.Customer.update,
+            braintree.CreditCard.__init__,
+            braintree.CreditCard.find,
+            braintree.CreditCard.create,
+            braintree.CreditCard.delete,
+            braintree.CreditCard.update,
+            braintree.Transaction.__init__,
+            braintree.Transaction.find,
+            braintree.Transaction.create,
+        ]
+
+        for original_method, patched_method in zip(original_methods, patched_methods):
+            self.assertNotEqual(original_method, patched_method)
+
+        for original_method, unpatched_method in zip(original_methods, unpatched_methods):
+            self.assertEqual(original_method, unpatched_method)
+
+    def test_advanced_search_gets_patched(self):
+        original_nodes = [
             braintree.CustomerSearch.id,
             braintree.CustomerSearch.payment_method_token,
             braintree.CustomerSearch.payment_method_token_with_duplicates,
@@ -535,17 +607,7 @@ class UnpatchAllMethods(NamespaceTest):
         ]
 
         with Namespace():
-            patched_methods = [
-                braintree.Customer.find,
-                braintree.Customer.create,
-                braintree.Customer.delete,
-                braintree.Customer.update,
-                braintree.CreditCard.find,
-                braintree.CreditCard.create,
-                braintree.CreditCard.delete,
-                braintree.CreditCard.update,
-                braintree.Transaction.find,
-                braintree.Transaction.create,
+            patched_nodes = [
                 braintree.CustomerSearch.id,
                 braintree.CustomerSearch.payment_method_token,
                 braintree.CustomerSearch.payment_method_token_with_duplicates,
@@ -554,28 +616,14 @@ class UnpatchAllMethods(NamespaceTest):
                 braintree.TransactionSearch.customer_id,
             ]
 
-        unpatched_methods = [
-            braintree.Customer.find,
-            braintree.Customer.create,
-            braintree.Customer.delete,
-            braintree.Customer.update,
-            braintree.CreditCard.find,
-            braintree.CreditCard.create,
-            braintree.CreditCard.delete,
-            braintree.CreditCard.update,
-            braintree.Transaction.find,
-            braintree.Transaction.create,
-            braintree.CustomerSearch.id,
-            braintree.CustomerSearch.payment_method_token,
-            braintree.CustomerSearch.payment_method_token_with_duplicates,
-            braintree.TransactionSearch.id,
-            braintree.TransactionSearch.payment_method_token,
-            braintree.TransactionSearch.customer_id,
-        ]
+        # NamespaceError is raised on __getattribute__ for patched nodes.
 
-        self.assertEqual(original_methods, unpatched_methods)
-        for original_method, patched_method in zip(original_methods, patched_methods):
-            self.assertFalse(original_method is patched_method)
+        for node in original_nodes:
+            self.assertIsNone(getattr(node, 'foo', None))  # should not raise NamespaceError
+
+        for node in patched_nodes:
+            with self.assertRaises(NamespaceError):
+                self.assertIsNone(getattr(node, 'foo', None))
 
 if __name__ == '__main__':
     main()

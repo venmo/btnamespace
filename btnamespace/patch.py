@@ -2,6 +2,8 @@ import copy
 import functools
 import logging
 
+from mock import patch
+
 from .compat import getcallargs
 from .schemas import ResourceId
 
@@ -79,12 +81,16 @@ class PatchedMethod(object):
 class SchemaPatcher(object):
     def __init__(self):
         self._action_state = {}
+        self._patchers = []
 
-    def apply_patches(self, call_schemas):
+    def create_patchers(self, call_schemas):
+        patchers = []
+
         for call_schema in call_schemas:
             bt_class = call_schema.bt_class
             original_method = getattr(bt_class, call_schema.method_name)
 
             replacement = PatchedMethod(original_method, self._action_state, call_schema)
+            patchers.append(patch.object(bt_class, call_schema.method_name, replacement))
 
-            setattr(bt_class, call_schema.method_name, replacement)
+        return patchers
