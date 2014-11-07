@@ -12,17 +12,28 @@ class Namespace(object):
     """A Namespace is a context manager which guarantees that state on Braintree
     will not be shared."""
 
-    def __init__(self, custom_schemas=None):
+    def __init__(self, custom_schemas=None, options=None):
         """
         :param customer_schemas: (optional) a list of CallSchemas to guide patching.
           If they're not provided, those defined in actions.schemas will be used.
+        :param options (optional) a dictionary of configuration passed through to
+          actions. Built in options:
+              * 'strict_missing': raise a braintree.exceptions.NotFoundError when
+                non-namespaced resources are requested. By default this will be
+                warned and logged, but the request allowed to be made.
+
+          All options are False by default.
         """
 
         if custom_schemas is None:
             custom_schemas = schemas
 
+        if options is None:
+            options = {}
+
         self.schemas = custom_schemas
-        self.schema_patcher = SchemaPatcher()
+        self.options = options
+        self.schema_patcher = SchemaPatcher(self.options)
         self._patchers = self.schema_patcher.create_patchers(self.schemas)
 
         search_patch_nodes = {

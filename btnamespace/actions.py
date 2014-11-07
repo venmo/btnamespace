@@ -27,14 +27,14 @@ def ensure_state_is_init(f):
     return wrapper
 
 
-def clear_old_creation_ids(state, call_params):
+def clear_old_creation_ids(state, call_params, options):
     # Used as a start_hook in appcode entry points (ie, not __init__)
     # to ensure that old state doesn't stick around.
     state['last_fake_ids'] = {}
 
 
 @ensure_state_is_init
-def convert_to_real_id(params, schema_params, key, resource_id, state):
+def convert_to_real_id(params, schema_params, key, resource_id, state, options):
     fake_id = params[key]
     id_maps = state['id_maps']
 
@@ -57,7 +57,7 @@ def convert_to_real_id(params, schema_params, key, resource_id, state):
 
 
 @ensure_state_is_init
-def delete_and_store(params, schema_params, key, resource_id, state):
+def delete_and_store(params, schema_params, key, resource_id, state, options):
     provided_id = params[key]
     bt_class = resource_id.bt_class
     id_maps = state['id_maps']
@@ -76,7 +76,7 @@ def delete_and_store(params, schema_params, key, resource_id, state):
 
 
 @ensure_state_is_init
-def convert_to_fake_id(params, schema_params, key, resource_id, state):
+def convert_to_fake_id(params, schema_params, key, resource_id, state, options):
     real_id = params[key]
     id_maps = state['id_maps']
     bt_class = resource_id.bt_class
