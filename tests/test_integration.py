@@ -64,8 +64,6 @@ class StrictMissingOptionTest(NamespaceTest):
             "last_name": "User",
         })
 
-        self.options = {'strict_missing': True}
-
         # Cleanups are run LIFO, so this runs outside of the namespace.
         self.addCleanup(braintree.Customer.delete, 'existing')
         super(StrictMissingOptionTest, self).setUp()
@@ -74,6 +72,8 @@ class StrictMissingOptionTest(NamespaceTest):
         braintree.Customer.find('existing')  # should not raise NotFoundError
 
     def test_strict_missing_will_404_existing_nonnamespace_user(self):
+        self.namespace.options['strict_missing'] = True
+
         with self.assertRaises(braintree.exceptions.NotFoundError):
             braintree.Customer.find('existing')
 

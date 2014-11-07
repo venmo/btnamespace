@@ -2,6 +2,7 @@ import collections
 import logging
 
 from bidict import namedbidict
+import braintree
 
 from .compat import getcallargs
 
@@ -48,9 +49,12 @@ def convert_to_real_id(params, schema_params, key, resource_id, state, options):
         # This can happen in two cases:
         #   * The caller made a mistake and didn't create the resource yet.
         #   * The caller created the resource, but not through our (patched) braintree library.
-        logger.warning("The braintree id %r has not been previously stored."
-                       " Either the resource was never created,"
-                       " or it was not created through this client and namespace.", fake_id)
+        if options.get('strict_missing', False):
+            raise braintree.exceptions.NotFoundError
+        else:
+            logger.warning("The braintree id %r has not been previously stored."
+                           " Either the resource was never created,"
+                           " or it was not created through this client and namespace.", fake_id)
 
     params[key] = real_id
     logger.debug("%r --[real_id]--> %r", fake_id, params[key])
