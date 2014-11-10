@@ -44,8 +44,7 @@ class ActionOutsideNamespaceTest(TestCase):
 
 class NamespaceTest(TestCase):
     def setUp(self):
-        options = getattr(self, 'options', {})
-        self.namespace = Namespace(options=options)
+        self.namespace = Namespace()
         self.namespace.__enter__()
         self.addCleanup(self.namespace.__exit__)
 
