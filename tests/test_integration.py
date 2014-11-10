@@ -540,8 +540,9 @@ class PatchClientTokenGenerate(NamespaceTest):
 
 
 class PatchAllTest(TestCase):
-    def test_schema_methods_get_patched(self):
-        original_methods = [
+    @staticmethod
+    def _get_current_methods():
+        return [
             braintree.Customer.__init__,
             braintree.Customer.find,
             braintree.Customer.create,
@@ -557,47 +558,9 @@ class PatchAllTest(TestCase):
             braintree.Transaction.create,
         ]
 
-        with Namespace():
-            patched_methods = [
-                braintree.Customer.__init__,
-                braintree.Customer.find,
-                braintree.Customer.create,
-                braintree.Customer.delete,
-                braintree.Customer.update,
-                braintree.CreditCard.__init__,
-                braintree.CreditCard.find,
-                braintree.CreditCard.create,
-                braintree.CreditCard.delete,
-                braintree.CreditCard.update,
-                braintree.Transaction.__init__,
-                braintree.Transaction.find,
-                braintree.Transaction.create,
-            ]
-
-        unpatched_methods = [
-            braintree.Customer.__init__,
-            braintree.Customer.find,
-            braintree.Customer.create,
-            braintree.Customer.delete,
-            braintree.Customer.update,
-            braintree.CreditCard.__init__,
-            braintree.CreditCard.find,
-            braintree.CreditCard.create,
-            braintree.CreditCard.delete,
-            braintree.CreditCard.update,
-            braintree.Transaction.__init__,
-            braintree.Transaction.find,
-            braintree.Transaction.create,
-        ]
-
-        for original_method, patched_method in zip(original_methods, patched_methods):
-            self.assertNotEqual(original_method, patched_method)
-
-        for original_method, unpatched_method in zip(original_methods, unpatched_methods):
-            self.assertEqual(original_method, unpatched_method)
-
-    def test_advanced_search_gets_patched(self):
-        original_nodes = [
+    @staticmethod
+    def _get_current_search_nodes():
+        return [
             braintree.CustomerSearch.id,
             braintree.CustomerSearch.payment_method_token,
             braintree.CustomerSearch.payment_method_token_with_duplicates,
@@ -606,24 +569,35 @@ class PatchAllTest(TestCase):
             braintree.TransactionSearch.customer_id,
         ]
 
+    def test_schema_methods_get_patched(self):
+        original_methods = self._get_current_methods()
+
         with Namespace():
-            patched_nodes = [
-                braintree.CustomerSearch.id,
-                braintree.CustomerSearch.payment_method_token,
-                braintree.CustomerSearch.payment_method_token_with_duplicates,
-                braintree.TransactionSearch.id,
-                braintree.TransactionSearch.payment_method_token,
-                braintree.TransactionSearch.customer_id,
-            ]
+            patched_methods = self._get_current_methods()
+
+        unpatched_methods = self._get_current_methods()
+
+        for original_method, patched_method, unpatched_method in \
+                zip(original_methods, patched_methods, unpatched_methods):
+            self.assertEqual(original_method, unpatched_method)
+            self.assertNotEqual(original_method, patched_method)
+
+    def test_advanced_search_gets_patched(self):
+        original_nodes = self._get_current_search_nodes()
+
+        with Namespace():
+            patched_nodes = self._get_current_search_nodes()
+
+        unpatched_nodes = self._get_current_search_nodes()
 
         # NamespaceError is raised on __getattribute__ for patched nodes.
-
-        for node in original_nodes:
-            self.assertIsNone(getattr(node, 'foo', None))  # should not raise NamespaceError
+        for orig_node, unpatched_node in zip(original_nodes, unpatched_nodes):
+            self.assertIs(orig_node, unpatched_node)
+            self.assertIsNone(getattr(orig_node, 'foo', None))  # should not raise NamespaceError
 
         for node in patched_nodes:
             with self.assertRaises(NamespaceError):
-                self.assertIsNone(getattr(node, 'foo', None))
+                node.foo
 
 if __name__ == '__main__':
     main()
