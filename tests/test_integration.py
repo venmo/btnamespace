@@ -24,13 +24,6 @@ def _ensure_user_exists(user_params):
     braintree.Customer.find(user_params['id'])
 
 
-class NamespaceTest(TestCase):
-    def setUp(self):
-        self.namespace = Namespace()
-        self.namespace.__enter__()
-        self.addCleanup(self.namespace.__exit__)
-
-
 class ActionOutsideNamespaceTest(TestCase):
     def test_customer_operations_outside_of_namespace(self):
         with self.assertRaises(braintree.exceptions.NotFoundError):
@@ -47,6 +40,41 @@ class ActionOutsideNamespaceTest(TestCase):
             braintree.Customer.find('nonnamespaced')
         except braintree.exceptions.NotFoundError:
             self.fail()
+
+
+class NamespaceTest(TestCase):
+    def setUp(self):
+        self.namespace = Namespace()
+        self.namespace.__enter__()
+        self.addCleanup(self.namespace.__exit__)
+
+
+class OptionsTest(NamespaceTest):
+    def test_omit_options_gets_empty(self):
+        namespace = Namespace()
+        self.assertEqual(namespace.options, {})
+
+
+class StrictMissingOptionTest(NamespaceTest):
+    def setUp(self):
+        _ensure_user_exists({
+            "id": "existing",
+            "first_name": "Existing",
+            "last_name": "User",
+        })
+
+        # Cleanups are run LIFO, so this runs outside of the namespace.
+        self.addCleanup(braintree.Customer.delete, 'existing')
+        super(StrictMissingOptionTest, self).setUp()
+
+    def test_existing_nonnamespace_user_found_with_default_options(self):
+        braintree.Customer.find('existing')  # should not raise NotFoundError
+
+    def test_strict_missing_will_404_existing_nonnamespace_user(self):
+        self.namespace.options['strict_missing'] = True
+
+        with self.assertRaises(braintree.exceptions.NotFoundError):
+            braintree.Customer.find('existing')
 
 
 class PatchDeleteTest(NamespaceTest):

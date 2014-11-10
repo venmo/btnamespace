@@ -13,16 +13,18 @@ logger = logging.getLogger(__name__)
 class PatchedMethod(object):
     """Instances of this callable replace braintree methods."""
 
-    def __init__(self, method, state, call_schema):
+    def __init__(self, method, state, call_schema, options):
         """
         :param method: a staticmethod or instance method
         :param state: the state dictionary to provide to actions
         :param call_schema
+        :param options: dictionary with arbitrary contents passed through to actions
         """
 
         self.method = method
         self.state = state
         self.call_schema = call_schema
+        self.options = options
 
     def __call__(self, *args, **kwargs):
         named_args = getcallargs(self.method, *args, **kwargs)
@@ -35,7 +37,7 @@ class PatchedMethod(object):
             named_args_copy[key] = copy.deepcopy(named_args_copy[key])
 
         if self.call_schema.start_hook is not None:
-            self.call_schema.start_hook(self.state, named_args_copy)
+            self.call_schema.start_hook(self.state, named_args_copy, self.options)
 
         self._apply_param_actions(named_args_copy, self.call_schema.params)
 
@@ -64,7 +66,7 @@ class PatchedMethod(object):
                 params[key] = str(params[key])
 
                 resource_id.action(params, schema_params, key,
-                                   resource_id, self.state)
+                                   resource_id, self.state, self.options)
             else:
                 logger.error("Invalid value in schema params: %r. schema_params: %r and params: %r",
                              val, schema_params, params)
@@ -79,9 +81,9 @@ class PatchedMethod(object):
 
 
 class SchemaPatcher(object):
-    def __init__(self):
+    def __init__(self, options):
         self._action_state = {}
-        self._patchers = []
+        self.options = options
 
     def create_patchers(self, call_schemas):
         patchers = []
@@ -90,7 +92,8 @@ class SchemaPatcher(object):
             bt_class = call_schema.bt_class
             original_method = getattr(bt_class, call_schema.method_name)
 
-            replacement = PatchedMethod(original_method, self._action_state, call_schema)
+            replacement = PatchedMethod(original_method, self._action_state,
+                                        call_schema, self.options)
             patchers.append(patch.object(bt_class, call_schema.method_name, replacement))
 
         return patchers
