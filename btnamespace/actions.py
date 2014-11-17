@@ -50,7 +50,8 @@ def convert_to_real_id(params, schema_params, key, resource_id, state, options):
         #   * The caller made a mistake and didn't create the resource yet.
         #   * The caller created the resource, but not through our (patched) braintree library.
         if options.get('strict_missing', False):
-            raise braintree.exceptions.NotFoundError
+            exception = options.get('strict_missing_exception', braintree.exceptions.NotFoundError)
+            raise exception
         else:
             logger.warning("The braintree id %r has not been previously stored."
                            " Either the resource was never created,"
