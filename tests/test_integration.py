@@ -78,9 +78,13 @@ class StrictMissingOptionTest(NamespaceTest):
 
     def test_strict_missing_exception_overrides_notfounderror(self):
         self.namespace.options['strict_missing'] = True
-        self.namespace.options['strict_missing_exception'] = ValueError
 
-        with self.assertRaises(ValueError):
+        class MyError(Exception):
+            pass
+
+        self.namespace.options['strict_missing_exception'] = MyError
+
+        with self.assertRaises(MyError):
             braintree.Customer.find('existing')
 
 
