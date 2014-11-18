@@ -1,5 +1,3 @@
-import collections
-
 import braintree
 from mock import patch
 
@@ -21,13 +19,13 @@ class Namespace(object):
           at runtime to affect the next action run.
 
           Built in options:
-              * 'strict_missing': raise a braintree.exceptions.NotFoundError when
-                non-namespaced resources are requested. Default behavior is to
-                log a warning but allow the request to proceed, which
-                can potentially return non-namespaced resources from inside
-                a namespace.
-
-          All options are False by default.
+              * 'strict_missing' and 'strict_missing_exception': by default,
+                attempts to access non-namespaced resources will log a warning
+                but be allowed to proceed.
+                If strict_missing is True, an exception will be raised before
+                the request is sent.
+                By default this exception is braintree.exceptions.NotFoundError,
+                but can be overridden with strict_missing_exception.
         """
 
         if custom_schemas is None:

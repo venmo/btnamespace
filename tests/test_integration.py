@@ -56,6 +56,9 @@ class OptionsTest(NamespaceTest):
 
 
 class StrictMissingOptionTest(NamespaceTest):
+    class MyError(Exception):
+        pass
+
     def setUp(self):
         _ensure_user_exists({
             "id": "existing",
@@ -74,6 +77,22 @@ class StrictMissingOptionTest(NamespaceTest):
         self.namespace.options['strict_missing'] = True
 
         with self.assertRaises(braintree.exceptions.NotFoundError):
+            braintree.Customer.find('existing')
+
+    def test_strict_missing_exception_overrides_notfounderror(self):
+        self.namespace.options['strict_missing'] = True
+
+        self.namespace.options['strict_missing_exception'] = self.MyError
+
+        with self.assertRaises(self.MyError):
+            braintree.Customer.find('existing')
+
+    def test_strict_missing_exception_overrides_strict_missing(self):
+        self.namespace.options['strict_missing'] = False
+
+        self.namespace.options['strict_missing_exception'] = self.MyError
+
+        with self.assertRaises(self.MyError):
             braintree.Customer.find('existing')
 
 
