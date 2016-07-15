@@ -1,5 +1,14 @@
 History
 -------
+2.0.0
++++++
+released 2016-07-15
+
+- breaking: drop python 2.6 support
+- fix a bug affecting operations after exiting a namespace
+- add strict_missing and strict_missing_exception options
+
+
 1.1.1
 +++++
 released 2014-09-26
