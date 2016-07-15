@@ -324,10 +324,10 @@ class PatchCreateTest(NamespaceTest):
         return self.namespace.schema_patcher._action_state['id_maps']
 
     def get_real_id(self, bt_class, fake_id):
-        return self.id_maps()[bt_class].fake_ids[fake_id]
+        return self.id_maps()[bt_class].fake_id_for[fake_id]
 
     def get_fake_id(self, bt_class, real_id):
-        return self.id_maps()[bt_class].real_ids[real_id]
+        return self.id_maps()[bt_class].real_id_for[real_id]
 
     def assert_self_mapping(self, bt_class, fake_id):
         """Assert that this id is mapped symetrically to itself."""
@@ -527,8 +527,8 @@ class PatchCreditCardCreate(PatchCreateTest):
         result = braintree.CreditCard.create(params)
         self.assertTrue(result.is_success, result)
 
-        self.assertTrue('first_id' not in self.id_maps()[braintree.CreditCard].fake_ids)
-        self.assertTrue('second_id' in self.id_maps()[braintree.CreditCard].fake_ids)
+        self.assertTrue('first_id' not in self.id_maps()[braintree.CreditCard].fake_id_for)
+        self.assertTrue('second_id' in self.id_maps()[braintree.CreditCard].fake_id_for)
 
 
 class PatchAdvancedSearch(NamespaceTest):

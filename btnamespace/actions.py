@@ -8,7 +8,7 @@ from .compat import getcallargs
 
 logger = logging.getLogger(__name__)
 
-IDMap = namedbidict('IDMap', 'fake_ids', 'real_ids')
+IDMap = namedbidict('IDMap', 'fake_id', 'real_id')
 
 
 def ensure_state_is_init(f):
@@ -44,7 +44,7 @@ def convert_to_real_id(params, schema_params, key, resource_id, state, options):
     # to replace it, everything still proceeds normally.
     real_id = fake_id
     try:
-        real_id = id_maps[resource_id.bt_class].fake_ids[fake_id]
+        real_id = id_maps[resource_id.bt_class].fake_id_for[fake_id]
     except KeyError:
         # This can happen in two cases:
         #   * The caller made a mistake and didn't create the resource yet.
@@ -68,10 +68,10 @@ def delete_and_store(params, schema_params, key, resource_id, state, options):
     bt_class = resource_id.bt_class
     id_maps = state['id_maps']
 
-    if provided_id in id_maps[bt_class].fake_ids:
+    if provided_id in id_maps[bt_class].fake_id_for:
         # Properly handle duplicate creates of the same id.
         # We should pass these through, since the gateway will return an error.
-        params[key] = id_maps[bt_class].fake_ids[provided_id]
+        params[key] = id_maps[bt_class].fake_id_for[provided_id]
         logger.debug("would have deleted, but %r has been used in a prior creation", provided_id)
     else:
         # We need to know which id the client expects the response to be mapped to.
@@ -88,7 +88,7 @@ def convert_to_fake_id(params, schema_params, key, resource_id, state, options):
     bt_class = resource_id.bt_class
     last_fake_ids = state['last_fake_ids']
 
-    if real_id not in id_maps[bt_class].real_ids:
+    if real_id not in id_maps[bt_class].real_id_for:
         # We need to update our mapping.
         # This condition also prevents us from updating existing mappings,
         # which we'd want to change to support id updates.
@@ -105,8 +105,8 @@ def convert_to_fake_id(params, schema_params, key, resource_id, state, options):
             #       operation is incredibly slim.
             fake_id = real_id
 
-        id_maps[bt_class].fake_ids[fake_id] = real_id
+        id_maps[bt_class].fake_id_for[fake_id] = real_id
         logger.debug('mapping updated: fake_id %r == %r', fake_id, real_id)
 
-    params[key] = id_maps[bt_class].real_ids[real_id]
+    params[key] = id_maps[bt_class].real_id_for[real_id]
     logger.debug("%r <--[fake_id]-- %r", params[key], real_id)
