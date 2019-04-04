@@ -4,6 +4,8 @@ btnamespace
 .. image:: https://travis-ci.org/venmo/btnamespace.svg?branch=master
     :target: https://travis-ci.org/venmo/btnamespace
 
+*[not actively supported outside of internal Venmo usage]*
+
 A Braintree namespace isolates state on the Braintree gateway:
 
 .. code-block:: python
