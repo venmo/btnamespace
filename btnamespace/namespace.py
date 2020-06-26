@@ -1,3 +1,4 @@
+from builtins import object
 import braintree
 from mock import patch
 
@@ -47,7 +48,7 @@ class Namespace(object):
                 'id', 'payment_method_token', 'customer_id'],
         }
 
-        for search_cls, node_names in search_patch_nodes.items():
+        for search_cls, node_names in list(search_patch_nodes.items()):
             for node_name in node_names:
                 self._patchers.append(
                     patch.object(search_cls, node_name, UnsupportedSearchNode())
