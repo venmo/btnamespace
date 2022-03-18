@@ -1,5 +1,18 @@
 History
 -------
+
+2.1.1
++++++
+released 2022-03-18
+
+- Add missing history notes
+
+2.1.0
++++++
+released 2022-03-18
+
+- Add support for Python 3.5 and 3.7
+
 2.0.0
 +++++
 released 2016-07-15
@@ -7,7 +20,6 @@ released 2016-07-15
 - breaking: drop python 2.6 support
 - fix a bug affecting operations after exiting a namespace
 - add strict_missing and strict_missing_exception options
-
 
 1.1.1
 +++++
