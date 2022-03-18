@@ -1,6 +1,8 @@
 btnamespace
 ===========
 
+*[not actively supported outside of internal Venmo usage]*
+
 A Braintree namespace isolates state on the Braintree gateway:
 
 .. code-block:: python
