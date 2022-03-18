@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from builtins import zip
 from builtins import str
 import copy
@@ -5,15 +7,16 @@ import os
 import uuid
 
 import braintree
-from unittest2 import TestCase, main
+from unittest import TestCase, main
 
 from btnamespace import Namespace, NamespaceError
 
+
 braintree.Configuration.configure(
     braintree.Environment.Sandbox,
-    os.environ['BT_MERCHANT_ID'],
-    os.environ['BT_PUBLIC_KEY'],
-    os.environ['BT_PRIVATE_KEY'],
+    merchant_id=os.environ["BT_MERCHANT_ID"],
+    public_key=os.environ["BT_PUBLIC_KEY"],
+    private_key=os.environ["BT_PRIVATE_KEY"],
 )
 
 
