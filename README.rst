@@ -1,11 +1,6 @@
 btnamespace
 ===========
 
-.. image:: https://travis-ci.org/venmo/btnamespace.svg?branch=master
-    :target: https://travis-ci.org/venmo/btnamespace
-
-*[not actively supported outside of internal Venmo usage]*
-
 A Braintree namespace isolates state on the Braintree gateway:
 
 .. code-block:: python
@@ -80,7 +75,7 @@ Inside your vitualenv:
 
     $ cd btnamespace
     $ pip install -e .
-    $ pip install -r requirements.txt
+    $ pip install -r dev-requirements.txt
 
 
 To run the tests, first add your sandbox credentials:
@@ -92,4 +87,4 @@ To run the tests, first add your sandbox credentials:
     $ export BT_PRIVATE_KEY=private-key
 
 
-Then run ``$ python tests/test_integration.py``.
+Then run ``$ pytest``.
