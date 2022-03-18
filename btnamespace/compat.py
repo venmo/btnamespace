@@ -2,6 +2,8 @@
 Single interface for code that varies across Python environments.
 """
 
+from builtins import zip
+from builtins import next
 import inspect
 import sys
 
@@ -44,9 +46,9 @@ def getcallargs(func, *positional, **named):
         if isinstance(arg, str):
             return arg in arg2value
         return arg in assigned_tuple_params
-    if inspect.ismethod(func) and func.im_self is not None:
+    if inspect.ismethod(func) and func.__self__ is not None:
         # implicit 'self' (or 'cls' for classmethods) argument
-        positional = (func.im_self,) + positional
+        positional = (func.__self__,) + positional
     num_pos = len(positional)
     num_total = num_pos + len(named)
     num_args = len(args)
@@ -80,7 +82,7 @@ def getcallargs(func, *positional, **named):
         assign(varkw, named)
     elif named:
         unexpected = next(iter(named))
-        if isinstance(unexpected, unicode):
+        if isinstance(unexpected, str):
             unexpected = unexpected.encode(sys.getdefaultencoding(), 'replace')
         raise TypeError("%s() got an unexpected keyword argument '%s'" %
                         (f_name, unexpected))

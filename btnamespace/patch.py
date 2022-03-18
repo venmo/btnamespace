@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import copy
 import functools
 import logging
@@ -52,7 +54,7 @@ class PatchedMethod(object):
     def _apply_param_actions(self, params, schema_params):
         """Traverse a schema and perform the updates it describes to params."""
 
-        for key, val in schema_params.items():
+        for key, val in list(schema_params.items()):
             if key not in params:
                 continue
 
